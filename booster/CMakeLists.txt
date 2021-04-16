@@ -16,10 +16,18 @@ enable_testing()
 # Most important includes
 #
 
-include_directories(${CMAKE_BINARY_DIR})
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(.)
-include_directories(lib/test)
+set(BOOSTER_INCLUDE_DIRECTORIES
+	${CMAKE_BINARY_DIR}
+	${CMAKE_CURRENT_BINARY_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}/lib/test
+)
+
+#include_directories(${CMAKE_BINARY_DIR})
+#include_directories(${CMAKE_CURRENT_BINARY_DIR})
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+#include_directories(.)
+#include_directories(lib/test)
 
 if(WIN32 OR CYGWIN)
 	set(IS_WINDOWS TRUE)
@@ -570,7 +578,7 @@ if(NOT DISABLE_SHARED)
 	set_target_properties(booster PROPERTIES COMPILE_DEFINITIONS "${BOOSTER_SHARED_DEFS}")
 	set_target_properties(booster PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 	set_target_properties(booster PROPERTIES OUTPUT_NAME "booster${BOOSTER_SUFFIX}")
-
+	target_include_directories(booster PUBLIC ${BOOSTER_INCLUDE_DIRECTORIES})
 endif(NOT DISABLE_SHARED)	
 
 if(NOT DISABLE_STATIC)
@@ -579,6 +587,7 @@ if(NOT DISABLE_STATIC)
 	set_target_properties(booster-static PROPERTIES COMPILE_DEFINITIONS "${BOOST_STATIC_DEFS}")
 	set_target_properties(booster-static PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 	set_target_properties(booster-static PROPERTIES OUTPUT_NAME "booster${BOOSTER_SUFFIX}")
+	target_include_directories(booster-static PUBLIC ${BOOSTER_INCLUDE_DIRECTORIES})
 endif(NOT DISABLE_STATIC)
 
 install(DIRECTORY booster DESTINATION include
