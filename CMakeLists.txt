@@ -43,6 +43,7 @@ option(DISABLE_CACHE		"Disable cache beckend" OFF)
 option(DISABLE_TCPCACHE		"Disable distributed cache beckend" OFF)
 option(DISABLE_GZIP		"Disable support of gzip output compression" OFF)
 option(USE_STLPORT		"Build with STLPort library" OFF)
+option(DISABLE_TESTS		"Disable building of tests" OFF)
 
 if(USE_STLPORT) 
 	find_path(STLPORT_INCLUDE stlport/iostream)
@@ -62,15 +63,26 @@ endif()
 
 add_subdirectory(booster)
 
-include_directories(booster)
-include_directories(src)
-include_directories(private)
-include_directories(cppcms_boost)
-include_directories(${CMAKE_BINARY_DIR})
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/booster)
-include_directories(${CMAKE_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+set(CPPCMS_INCLUDE_DIRECTORIES
+	${CMAKE_BINARY_DIR}
+	${CMAKE_CURRENT_BINARY_DIR}
+	${CMAKE_SOURCE_DIR}
+	${CMAKE_SOURCE_DIR}/src
+	${CMAKE_SOURCE_DIR}/private
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}/src
+	${CMAKE_CURRENT_SOURCE_DIR}/private
+)
+
+#include_directories(booster)
+#include_directories(src)
+#include_directories(private)
+#include_directories(cppcms_boost)
+#include_directories(${CMAKE_BINARY_DIR})
+#include_directories(${CMAKE_CURRENT_BINARY_DIR})
+#include_directories(${CMAKE_CURRENT_BINARY_DIR}/booster)
+#include_directories(${CMAKE_SOURCE_DIR})
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 if(DISABLE_CACHE)
 	set(DISABLE_PREFORK_CACHE ON)
@@ -474,6 +486,7 @@ endif()
 
 if(NOT DISABLE_SHARED)
 	add_library(cppcms SHARED ${CPPCMS_SOURCES})
+	target_include_directories(cppcms PUBLIC ${CPPCMS_INCLUDE_DIRECTORIES})
 	set(CPPCMS_LIB cppcms)
 else(NOT DISABLE_SHARED)
 	set(CPPCMS_LIB cppcms-static)
@@ -481,6 +494,7 @@ endif(NOT DISABLE_SHARED)
 
 if(NOT DISABLE_STATIC)
 	add_library(cppcms-static STATIC ${CPPCMS_SOURCES})
+	target_include_directories(cppcms-static PUBLIC ${CPPCMS_INCLUDE_DIRECTORIES})
 endif(NOT DISABLE_STATIC)
 
 if(DISABLE_SHARED OR DISABLE_STATIC)
@@ -702,6 +716,7 @@ add_executable(cppcms_make_key src/make_key.cpp)
 target_link_libraries(cppcms_make_key ${CPPCMS_LIB})
 
 add_executable(cppcms_config_find_param src/cppcms_config_find_param.cpp src/json.cpp)
+target_include_directories(cppcms_config_find_param PRIVATE ${CPPCMS_INCLUDE_DIRECTORIES})
 if(DISABLE_SHARED)
 	target_link_libraries(cppcms_config_find_param booster-static)
 else(DISABLE_SHARED)
